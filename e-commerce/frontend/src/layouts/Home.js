@@ -14,8 +14,8 @@ function Home() {
     return (
         <div className="container">
             <Slider/>
-            <Section1 categoryId={1} categoryName="IPHONE"/>
-            <Section1 categoryId={2} categoryName="Android"/>
+            <Section1 categoryId={1} categoryName="Winter special"/>
+            <Section1 categoryId={2} categoryName="Decaff"/>
             <Deal/>
             <Apparel/>
             <Electronics/>

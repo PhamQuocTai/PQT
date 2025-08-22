@@ -11,19 +11,21 @@ import {
     SimpleForm, 
     TextField, 
     TextInput, 
-    useRecordContext 
+    useRecordContext,
+    ImageInput,
+    ImageField
 } from "react-admin";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import React from 'react';
-import { Button } from '@mui/material'; // Import Button from Material UI
+import { Button } from '@mui/material';
 
+// Nút Edit tùy chỉnh
 const CustomEditButton = () => {
     const record = useRecordContext();
     const navigate = useNavigate();
 
     const handleEdit = (event: React.MouseEvent) => {
-        event.stopPropagation(); // Prevent the default EditButton behavior
-        console.log('Edit button clicked for product:', record.productId);
+        event.stopPropagation();
         navigate(`/products/${record.productId}/edit`);
     };
 
@@ -34,6 +36,7 @@ const CustomEditButton = () => {
     );
 };
 
+// Field hiển thị ảnh với link cập nhật
 const CustomImageField = ({ source }: { source: string }) => {
     const record = useRecordContext();
 
@@ -44,7 +47,7 @@ const CustomImageField = ({ source }: { source: string }) => {
     return (
         <RouterLink 
             to={`/products/${record.productId}/update-image`}
-            onClick={(event) => event.stopPropagation()} // Ngăn rowClick kích hoạt khi click ảnh
+            onClick={(event) => event.stopPropagation()}
         >
             <img 
                 src={record[source]} 
@@ -55,6 +58,7 @@ const CustomImageField = ({ source }: { source: string }) => {
     );
 };
 
+// Bộ lọc tìm kiếm
 const postFilters = [
     <TextInput key="search" source="search" label="Search" alwaysOn />,
     <ReferenceInput key="categoryId" source="categoryId" reference="categories" label="Category">
@@ -64,7 +68,7 @@ const postFilters = [
 
 export const ProductList = () => (
     <List filters={postFilters}>
-        <Datagrid rowClick="edit"> {/* Allow row click to edit */}
+        <Datagrid rowClick="edit">
             <TextField source="productId" label="Product ID" />
             <TextField source="productName" label="Product Name" />
             <TextField source="category.categoryName" label="Category Name" />
@@ -83,17 +87,8 @@ export const ProductList = () => (
 export const ProductCreate = () => (
     <Create>
         <SimpleForm>
-            <TextInput 
-                source="productName" 
-                label="Product Name (Product name must contain at least 3 characters)" 
-            />
-            <TextInput 
-                source="description" 
-                label="Description (Product Description must contain at least 6 characters)" 
-                multiline 
-                rows={4} 
-                fullWidth 
-            />
+            <TextInput source="productName" />
+            <TextInput source="description" multiline rows={4} fullWidth />
             <NumberInput source="quantity" label="Quantity" />
             <NumberInput source="price" label="Price" />
             <NumberInput source="discount" label="Discount" />
@@ -101,32 +96,41 @@ export const ProductCreate = () => (
             <ReferenceInput source="categoryId" reference="categories">
                 <SelectInput optionText="name" />
             </ReferenceInput>
+
+            {/* Upload ảnh với accept kiểu object */}
+            <ImageInput 
+                source="image" 
+                label="Upload Image" 
+                accept={{ 'image/*': [] }}
+            >
+                <ImageField source="src" title="title" />
+            </ImageInput>
         </SimpleForm>
     </Create>
 );
 
-export const ProductEdit = () => {
-    console.log("ProductEdit component rendered");
-    return (
-        <Edit>
-            <SimpleForm>
-                <TextInput source="productId" disabled />
-                <ReferenceInput source="categoryId" reference="categories" label="Category">
-                    <SelectInput optionText="categoryName" />
-                </ReferenceInput>
-                <TextInput source="productName" />
-                <TextInput source="image" disabled />
-                <TextInput 
-                    source="description" 
-                    multiline 
-                    rows={4} 
-                    fullWidth 
-                />
-                <NumberInput source="quantity" />
-                <NumberInput source="price" />
-                <NumberInput source="discount" />
-                <NumberInput source="specialPrice" />
-            </SimpleForm>
-        </Edit>
-    );
-};
+export const ProductEdit = () => (
+    <Edit>
+        <SimpleForm>
+            <TextInput source="productId" disabled />
+            <ReferenceInput source="categoryId" reference="categories" label="Category">
+                <SelectInput optionText="categoryName" />
+            </ReferenceInput>
+            <TextInput source="productName" />
+            <TextInput source="description" multiline rows={4} fullWidth />
+            <NumberInput source="quantity" />
+            <NumberInput source="price" />
+            <NumberInput source="discount" />
+            <NumberInput source="specialPrice" />
+
+            {/* Cập nhật ảnh cũng phải đổi accept */}
+            <ImageInput 
+                source="image" 
+                label="Update Image" 
+                accept={{ 'image/*': [] }}
+            >
+                <ImageField source="src" title="title" />
+            </ImageInput>
+        </SimpleForm>
+    </Edit>
+);

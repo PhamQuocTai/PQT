@@ -4,21 +4,7 @@
             "type": "java",
             "name": "Example05Application",
             "request": "launch",
-            "mainClass": "Example05Application",
-            "projectName": "PhamQuocTai"
-        },
-        {
-            "type": "java",
-            "name": "Example05Application",
-            "request": "launch",
             "mainClass": "com.PhamQuocTai.example05.Example05Application",
-            "projectName": "example05"
-        },
-        {
-            "type": "java",
-            "name": "Example05Application",
-            "request": "launch",
-            "mainClass": "com.HuynhDuyKhanh.example05.Example05Application",
             "projectName": "example05"
         },
         {

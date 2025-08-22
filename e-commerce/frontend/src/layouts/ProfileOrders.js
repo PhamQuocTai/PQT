@@ -30,19 +30,17 @@ const ProfileOrders = () => {
       console.log('Response from API:', response);
       
       if (response) {
-        // Kiểm tra nếu response là array-like object
-        if (response.length && typeof response === 'object') {
-          console.log('Setting orders from array:', response);
-          setOrders(Array.from(response));
+        let fetchedOrders = [];
+        if (Array.isArray(response)) {
+          fetchedOrders = response;
         } else if (typeof response === 'object' && response.orderId) {
-          console.log('Setting single order:', [response]);
-          setOrders([response]);
-        } else {
-          console.log('No valid orders found, setting empty array');
-          setOrders([]);
+          fetchedOrders = [response];
         }
+        setOrders(fetchedOrders);
+
+        // Giả lập thay đổi trạng thái
+        simulateOrderStatus(fetchedOrders);
       } else {
-        console.log('Response is null or undefined, setting empty array');
         setOrders([]);
       }
     } catch (error) {
@@ -52,6 +50,35 @@ const ProfileOrders = () => {
       setLoading(false);
     }
   };
+
+  const simulateOrderStatus = (currentOrders) => {
+    currentOrders.forEach((order) => {
+      if (order.orderStatus === 'PENDING') {
+        // Sau 10-20s đổi thành CONFIRMED
+        setTimeout(() => {
+          setOrders(prev =>
+            prev.map(o => o.orderId === order.orderId ? { ...o, orderStatus: 'CONFIRMED' } : o)
+          );
+        }, randomDelay(10000, 20000));
+
+        // Sau 20-30s đổi thành SHIPPING
+        setTimeout(() => {
+          setOrders(prev =>
+            prev.map(o => o.orderId === order.orderId ? { ...o, orderStatus: 'SHIPPING' } : o)
+          );
+        }, randomDelay(20000, 30000));
+
+        // Sau 40-50s đổi thành DELIVERED
+        setTimeout(() => {
+          setOrders(prev =>
+            prev.map(o => o.orderId === order.orderId ? { ...o, orderStatus: 'DELIVERED' } : o)
+          );
+        }, randomDelay(40000, 50000));
+      }
+    });
+  };
+
+  const randomDelay = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
   if (loading) {
     return (
@@ -105,11 +132,16 @@ const ProfileOrders = () => {
                     <header className="card-header">
                       <strong className="d-inline-block mr-3">Mã đơn hàng: {order.orderId}</strong>
                       <span>Ngày đặt: {new Date(order.orderDate).toLocaleDateString('vi-VN')}</span>
-                      <span className="badge badge-pill badge-info float-right">
+                      <span className={`badge badge-pill float-right 
+                        ${order.orderStatus === 'PENDING' ? 'badge-secondary' :
+                          order.orderStatus === 'CONFIRMED' ? 'badge-warning' :
+                          order.orderStatus === 'SHIPPING' ? 'badge-info' :
+                          order.orderStatus === 'DELIVERED' ? 'badge-success' :
+                          order.orderStatus === 'CANCELLED' ? 'badge-danger' : 'badge-light'}`}>
                         {order.orderStatus === 'PENDING' ? 'Đang xử lý' : 
-                         order.orderStatus === 'CONFIRMED' ? 'Đã xác nhận' :
+                         order.orderStatus === 'CONFIRMED' ? 'Đang chuẩn bị hàng' :
                          order.orderStatus === 'SHIPPING' ? 'Đang giao hàng' :
-                         order.orderStatus === 'DELIVERED' ? 'Đã giao hàng' :
+                         order.orderStatus === 'DELIVERED' ? 'Giao hàng thành công' :
                          order.orderStatus === 'CANCELLED' ? 'Đã hủy' : order.orderStatus}
                       </span>
                     </header>
